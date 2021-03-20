@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+
+{% block title %}
+Account Info - {{ block.super }}
+{% endblock %}
+
+{% block content %}
+{% include 'breadcrumbs.html' %}
+<div class='col-md-3'>
+	<ul class="nav nav-pills nav-stacked">
+		<li role="presentation" class="active"><a href="#">account information</a></li>	
+		{% comment %}
+		<li role="presentation"><a href="{% url 'user_billing_address' %}">Billing Address</a></li>
+		{% endcomment %}	
+		<li role="presentation"><a href="{% url 'user_mailing_address'%}">Mail address</a></li>
+	</ul>
+</div>
+<div class='col-md-9'>
+	<h3>Update account information</h3><br>
+	<form action="{% url 'user_account_info' %}" method="post">
+	    {% csrf_token %}
+	    {{ form.email.label }}
+	    {{ form.email|add_class:"form-control"|append_attr:"placeholder:email address" }}<br>
+	    {{ form.username.label }}
+	    {{ form.username|add_class:"form-control"|append_attr:"placeholder:username" }}<br>
+	    {{ form.first_name.label }}
+	    {{ form.first_name|add_class:"form-control"|append_attr:"placeholder:first name" }}<br>
+	    {{ form.last_name.label }}
+	    {{ form.last_name|add_class:"form-control"|append_attr:"placeholder:Last name" }}<br>
+
+	    <input class='btn btn-primary' type="submit" value="submit" />
+	</form>
+</div>
+{% endblock %}

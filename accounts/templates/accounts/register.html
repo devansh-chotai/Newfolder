@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+	<div class="col-xs-6 col-xs-offset-3">
+      <form method="POST" action="{% url 'user_register' %}">
+      {% csrf_token %}
+        <h2 class="form-signin-heading">register account</h2>
+    		<!-- {{ form.email }} {{ form.errors.email }}
+        {{ form.username }} {{ form.errors.username }}
+        {{ form.password }} {{ form.errors.password }}
+        {{ form.password_confirm }} {{ form.errors.password_confirm }} -->
+        {{form.as_p}}
+        <button class="btn btn-lg btn-primary btn-block" type="submit">registered</button>
+        <div class="page-header"></div>
+        <p class="text-center">Already have an account?<a href="{% url 'user_login' %}"> Login</a>.</p>
+      </form>
+      </div>
+</div>
+{% endblock %}

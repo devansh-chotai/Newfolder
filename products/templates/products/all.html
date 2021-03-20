@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+	{% if search_term %}
+		{% include 'breadcrumbs.html' %}
+		<h2><strong>&#34;{{ search_term }}&#34;</strong>Search results for</h2>
+	{% endif %}
+
+	{% if products %}
+
+		{% for product in products %}
+		  <div class="col-sm-6 col-md-4">
+		    <div class="thumbnail">
+		      <img src="/media/{{ MEDIA_URL }}{{ product.productimage_set.first.image }}" alt="{{ product.title }}"/>
+		      <div class="caption text-center">
+		        <h3>{{ product.title }}</h3>
+		        <p><b>&#8377;</b> {{ product.price }}</p>
+				<a href='{% url "single_product" product.slug %}' class="btn btn-default" role="button">Product details</a>
+		      </div>
+		    </div>
+		  </div>
+
+		{% endfor %}
+
+	{% else %}
+
+		{% if search_term %}
+			<p>Can't find what you want...try what's <a href="/">Trending</a></p>
+		{% else %}
+			<p>No prodcts have been listed in this store.</p>
+		{% endif %}
+
+	{% endif %}
+
+{% endblock %}
