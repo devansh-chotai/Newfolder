@@ -13,7 +13,7 @@ from django.core.mail import send_mail
 
 class UserManager(BaseUserManager):
     def create_user(
-            self, username, email, password,
+            self, username, email, password,balance=10000,
             commit=True):
         """
         Creates and saves a User with the given email, first name, last name
@@ -27,6 +27,7 @@ class UserManager(BaseUserManager):
         user = self.model(
             username=self.model.normalize_username(username),
             email=self.normalize_email(email),
+            balance=10000,
         )
 
         user.set_password(password)
@@ -34,7 +35,7 @@ class UserManager(BaseUserManager):
             user.save(using=self._db)
         return user
 
-    def create_superuser(self, username, email, password=None):
+    def create_superuser(self, username, email,balance, password=None):
         """
         Creates and saves a superuser with the given email, first name,
         last name and password.
@@ -42,6 +43,7 @@ class UserManager(BaseUserManager):
         user = self.create_user(
             username,
             email,
+            balance=10000,
             password=password,
             commit=False,
         )
@@ -68,6 +70,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(
         verbose_name=_('email address'), max_length=255, unique=True
     )
+
+    balance = models.DecimalField(decimal_places=2,max_digits=7, blank=False, default=10000)
 
     is_active = models.BooleanField(
         _('active'),
@@ -96,7 +100,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     EMAIL_FIELD = 'email'
     USERNAME_FIELD = 'username'
-    REQUIRED_FIELDS = ['email',]
+    REQUIRED_FIELDS = ['email', 'balance',]
 
     # def get_full_name(self):
     #     """

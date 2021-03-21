@@ -56,7 +56,7 @@ def my_cart(request):
 				request.session['total_items'] = total_items + 1
 
 		return HttpResponseRedirect(reverse('my_cart'))
-
+	
 	if request.method == 'PUT':
 		body = request.body.decode('utf-8')
 		data = json.loads(body)

@@ -55,7 +55,7 @@ My Cart - {{ block.super }}
 				{% endfor %}
 				</tbody>
 				<tfooter>
-					<tr>
+					<!-- <tr>
 						<td>Shipping charges</td>
 						<td></td>
 						<td></td>
@@ -63,8 +63,8 @@ My Cart - {{ block.super }}
 						<td></td>
 						<td id="shippingPrice"><b>&#8377;</b> 80.00 </td>
 						<td></td>
-					</tr>
-					<tr>
+					</tr> -->
+					<!-- <tr>
 						<td>Total price</td>
 						<td></td>
 						<td></td>
@@ -81,23 +81,25 @@ My Cart - {{ block.super }}
 						<td></td>
 						<td><b>&#8377;</b> {{ cart.get_tax }}</td>
 						<td></td>
-					</tr>
+					</tr> -->
 					<tr>
-						<td><strong>Total price after tax</strong></td>
+						<td><strong>price</strong></td>
 						<td></td>
 						<td></td>
 						<td></td>
 						<td><input id='updateBtn' type='submit' class='btn btn-success btn-xs pull-right' value='Update'></td>
-						<td id="subTotal" data-subtotal="{{ cart.get_total }}"><strong id="totalPrice"><b>&#8377;</b> {{cart.get_total}}</strong></td>
+						<td id="subTotal" data-subtotal="{{ cart.get_subtotal }}"><strong><b>&#8377;</b><span id="totalPrice"> {{cart.get_subtotal}}</span></strong></td>
+						<input type="hidden" id="balance" value="{{user.balance}}">
 						<td></td>
 					</tr>			
 				</tfooter>
 			</table>
 		</form>
 		<div class="text-center">
-			<span><button id="submitOrder" class="btn btn-success">Order</button></span>
+			<span><button id="submitOrder" class="btn btn-success">Checkout</button></span>
 			<span><a href="{% url 'all_products' %}"  class="btn btn-success">continue shopping</a></span>
-		</div>
+		</div><br>
+		<div class="text-center"><span id="lowBalance" class="hidden">Insufficcent balance <a href="{% url 'user_balance_info' %}">Add Money</a></span></div>
 		{% else %}
 			<p>The shopping cart is empty</p>
 		{% endif %}
@@ -159,24 +161,37 @@ $.ajaxSetup({
 
 $('#submitOrder').on('click', function(e){
 	e.preventDefault();
-	var totalPrice = $('#totalPrice').text();
-	console.log('order submitted');
+	var x = $('#totalPrice').text();
+	var totalPrice = parseInt(x);
+	var y = document.getElementById('balance').value;
+	var Balance = parseInt(y);
+	console.log(Balance);
 	console.log(totalPrice);
+	if(totalPrice < Balance){
+		console.log('ordered sucessfully')
+		Balance=Balance-totalPrice
+		console.log(Balance)
+		window.location.href = "http://127.0.0.1:8000/orders/";
 
-	$.ajax({
-		url:'/mycart/',
-		type: 'PUT',
-		contentType: 'application/json;charset=UTF-8',
-  		dataType: "json",
-  		data: JSON.stringify({'rate': 80, 'rate_id': 'NULL'}),
-  		success: function(r) {
-  			console.log(r);
-  		},
-  		error: function(r) {
-  			console.log(r);
-  		}	
-	})// end ajax
-
+	// 	$.ajax({
+	// 	url:'/mycart/',
+	// 	type: 'PUT',
+	// 	contentType: 'application/json;charset=UTF-8',
+  	// 	dataType: "json",
+  	// 	data: JSON.stringify({'rate': 80, 'rate_id': 'NULL'}),
+  	// 	success: function(r) {
+  	// 		console.log(r);
+  	// 	},
+  	// 	error: function(r) {
+  	// 		console.log(r);
+  	// 	}	
+	// })// end ajax
+	
+	}
+	else{
+		document.getElementById("lowBalance").classList.remove("hidden");;
+	}
 })
+
 </script>
 {% endblock %}

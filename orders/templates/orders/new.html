@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+My Cart - {{ block.super }}
+{% endblock %}
+
+{% block content %}
+{% include 'breadcrumbs.html' %}
+
+<h1>my final cart</h1>
+<div class="containter">
+	<div class="row">
+		<div class="col-md-10 col-md-offset-1">
+		<form action="{% url 'new_orders' %}" method="post">
+			{% csrf_token %}
+            <input type="hidden" id="balance" value="{{user.balance}}">
+            <!-- <h4 id="totalPrice">{{ order_total }}</h4> -->
+            <!-- <td id="subTotal" data-subtotal="{{ cart.get_total }}"><strong><b>&#8377;</b><span id="totalPrice"> {{cart.get_total}}</span></strong></td> -->
+            <table class="table">
+				<thead>
+					<tr>
+						<th>#</th>
+						<th>Product ID number</th>
+						<th>product name</th>
+						<th>unit price</th>
+						<th>Quantity</th>
+						<th>price</th>
+						<th></th>
+					</tr>
+				</thead>
+				<tbody>
+				{% for item in cart.cartitem_set.all %}
+				<tr>
+					<th scope="row">{{ forloop.counter }}</th>
+					<td>{{ item.product.id }}</td>
+					<td>
+						{{ item.product.title }}
+						{% if item.variation %}
+							{% for var in item.variation.all %}
+								<small>{{ var.category|title }}: {{ var.title }}</smalll><br>
+							{% endfor %}
+						{% endif %}
+					</td>
+					<td>{{ item.product.price }}</td>
+					<td>{{ item.quantity }}</td>
+					<td>{{ item.total_price }}</td>
+				</tr>
+				{% endfor %}
+				</tbody>
+				<tfooter>
+					<tr>
+						<td>Total price</td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td><b>&#8377;</b> {{ cart.get_subtotal }}</td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>Taxes (8%)</td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td><b>&#8377;</b> {{ cart.get_tax }}</td>
+						<td></td>
+                    </tr>
+                    <tr>
+						<td>Shipping charges</td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td id="shippingPrice"><b>&#8377;</b> 80.00 </td>
+						<td></td>
+					</tr>
+					<tr>
+						<td><strong>Total price</strong></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td id="subTotal" data-subtotal="{{ cart.get_total }}"><strong><b>&#8377;</b><span id="totalPrice"> {{cart.get_total}}</span></strong></td>
+						<td></td>
+					</tr>			
+				</tfooter>
+			</table>
+            <span><button type="submit" id="submitOrder" class="btn btn-success">Order</button></span>
+		</form>
+		<div class="text-center">
+			<span><a href="{% url 'all_products' %}"  class="btn btn-success">continue shopping</a></span>
+		</div><br>
+		<div class="text-center"><span id="lowBalance" class="hidden">Insufficcent balance <a href="{% url 'user_balance_info' %}">Add Money</a></span></div>
+		</div>
+	</div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<!-- <script src="{% static 'js/main.js' %}"></script> -->
+<script>
+
+$('#submitOrder').on('click', function(e){
+	// e.preventDefault();
+	var x = $('#totalPrice').text();
+	var totalPrice = parseInt(x);
+	var y = document.getElementById('balance').value;
+	var Balance = parseInt(y);
+	console.log(Balance);
+	console.log(totalPrice);
+	if(totalPrice < Balance){
+		console.log('ordered sucessfully')
+		Balance=Balance-totalPrice
+		console.log(Balance)
+	}
+	else{
+		document.getElementById("lowBalance").classList.remove("hidden");;
+	}
+})
+
+</script>
+{% endblock %}

@@ -5,19 +5,13 @@
 {% include 'breadcrumbs.html' %}
 
 <div class="row">
-	<b>{{product.productimage_set}}</b><br>
-	<b>{{product.productimage_set.first}}</b><br>
-	<b>{{product.productimage_set.first.image}}</b><br>
+	{% for images in pid %}
 	<div class="col-xs-12 col-sm-3">
-		<div class="thumbnail">
-			<img src="/media/{{ product.productimage_set.first.image }}" alt="{{ product.title }}"/
->		</div>
-		<div class="thumbnail">
-			<img src="/media/{{ product.productimage_set.second.image }}" alt="{{ product.title }}"/
->		</div>
-		<div class="thumbnail">
-			<img src="/media/{{ product.productimage_set.last.image }}" alt="{{ product.title }}"/
->		</div>	
+			<div class="thumbnail">
+				<img src="/media/{{ images.image }}" alt="{{ product.title }}"/>
+			</div>
+	</div>
+	{% endfor %}
 		<div class="caption text-center">
 			<form method="POST" action='{% url "my_cart" %}'>
 				{% csrf_token %}
@@ -57,13 +51,53 @@
 	</div>
 </div>
 
+<!--   Modal -->
+<div id="donm" class="t">
+
+	<div class="t-content">
+		<span id="donclose" class="closer" style="color:black">&times;</span>
+	  <div class="t-body">
+		<div class="row">
+			<div class="col-xs-6 col-xs-offset-3">
+			  <form class="form-signin" method="POST" action="">
+			  {% csrf_token %}
+				<h2 class="form-signin-heading">please sign in</h2>
+				{{ form.as_p }}
+				<button class="btn btn-lg btn-primary btn-block" type="submit">log in</button>
+			  </form>
+			  <div class="page-header"></div>
+			  <p class="text-center">Don’t have an account?<a href="{% url 'user_register' %}"> Register an account here</a>.</p>
+		</div>
+		</div>
+	  </div>
+	</div>
+  </div>
+
 {% if user.is_authenticated %}
 {% else %}
 <script>
-document.getElementById("cart").addEventListener("click", function(e){
-  e.preventDefault();
-  document.getElementById('login').style.removeProperty("display");
+// document.getElementById("cart").addEventListener("click", function(e){
+//   e.preventDefault();
+//   document.getElementById('login').style.removeProperty("display");
+// });
+var donm = document.getElementById("donm");
+var cls = document.getElementById("donclose");
+var recm = document.getElementById("cart");
+recm.onclick = function(e) {
+	e.preventDefault();	
+    donm.style.display = "block";
+}
+
+cls.onclick = function() {
+  donm.style.display = "none";
+}
+
+window.addEventListener("click", function(event) {
+  if (event.target == donm) {
+    donm.style.display = "none";
+  }
 });
+
 </script>
 {% endif %}
 

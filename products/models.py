@@ -22,7 +22,7 @@ class ProductImage(models.Model):
 	updated = models.DateTimeField(auto_now_add=False, auto_now=True)
 
 	def __str__(self):
-		return "<Image: %d - %s>" % (self.id, self.product.title)
+		return "<Image: %d - %s>" % (self.product_id, self.product.title)
 
 class VariationManager(models.Manager):
 	def all(self):

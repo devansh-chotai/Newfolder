@@ -5,44 +5,44 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.clickjacking import xframe_options_exempt
 
-from .forms import (User, UserMailingAddressForm,
-	UserAccountInfoForm, UserRegistrationForm, UserLoginForm)
+from .forms import (User, UserMailingAddressForm, BalanceUpdateForm,
+	UserAccountInfoForm, UserLoginForm)
 from .models import UserMailingAddress
 
-def user_register(request):
-	form = UserRegistrationForm()
+# def user_register(request):
+# 	form = UserRegistrationForm()
 
-	if request.method == 'POST':
-		form = UserRegistrationForm(request.POST)
-		if form.is_valid():
-			username = form.cleaned_data['username']
-			email = form.cleaned_data['email']
-			username_exist = User.objects.filter(username=username).last()
-			email_exist = User.objects.filter(email=email).first()
+# 	if request.method == 'POST':
+# 		form = UserRegistrationForm(request.POST)
+# 		if form.is_valid():
+# 			username = form.cleaned_data['username']
+# 			email = form.cleaned_data['email']
+# 			username_exist = User.objects.filter(username=username).last()
+# 			email_exist = User.objects.filter(email=email).first()
 
-			if username_exist:
-				messages.add_message(request, messages.ERROR, 'Username already exist. Please choose another one.')
+# 			if username_exist:
+# 				messages.add_message(request, messages.ERROR, 'Username already exist. Please choose another one.')
 
-			if email_exist:
-				messages.add_message(request, messages.ERROR, 'The email address has already been registered.')
+# 			if email_exist:
+# 				messages.add_message(request, messages.ERROR, 'The email address has already been registered.')
 
-			if form.cleaned_data['password'] == form.cleaned_data['password_confirm']\
-				and not username_exist and not email_exist:
-				new_user = User.objects.create(
-					username=username,
-					email=email)
-				new_user.set_password(form.cleaned_data['password'])
-				new_user.save()
+# 			if form.cleaned_data['password'] == form.cleaned_data['password_confirm']\
+# 				and not username_exist and not email_exist:
+# 				new_user = User.objects.create(
+# 					username=username,
+# 					email=email)
+# 				new_user.set_password(form.cleaned_data['password'])
+# 				new_user.save()
 
-				messages.add_message(request, messages.SUCCESS, 'Registered successfully')
-				return HttpResponseRedirect(reverse('all_products'))
-			else:
-				messages.add_message(request, messages.ERROR, "Inconsistent passwords")
+# 				messages.add_message(request, messages.SUCCESS, 'Registered successfully')
+# 				return HttpResponseRedirect(reverse('all_products'))
+# 			else:
+# 				messages.add_message(request, messages.ERROR, "Inconsistent passwords")
 
-	context = {'form': form}	
-	return render(request, 'accounts/register.html', context)
-
+# 	context = {'form': form}	
+# 	return render(request, 'accounts/register.html', context)
 def user_login(request):
 	form = UserLoginForm()
 	if request.method == 'POST':
@@ -127,4 +127,26 @@ def user_account_info(request):
 
 		return HttpResponseRedirect(reverse('user_account_info'))
 
-	return render(request, 'accounts/account.html', context)		
+	return render(request, 'accounts/account.html', context)
+
+@login_required
+def user_balance_info(request):
+	user = request.user
+	form = BalanceUpdateForm(
+				initial={
+					'balance': user.balance,
+				}
+			)
+	context = {'form': form}
+
+	if request.method == 'POST':
+		f = BalanceUpdateForm(request.POST, instance=user)
+		if f.is_valid():
+			user.balance = f.cleaned_data['balance']
+			user.save()
+
+		messages.add_message(request, messages.SUCCESS, 'Money updated successfully')
+
+		return HttpResponseRedirect(reverse('user_balance_info'))
+
+	return render(request, 'accounts/balance.html', context)		

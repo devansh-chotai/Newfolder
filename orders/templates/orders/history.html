@@ -21,7 +21,7 @@
 					<td>{{ order.status }}</td>
 					<td>
 					{% for product in order.cart.products.all %}
-						{{ product }}<br>
+						{{ product.title }}<br>
 					{% endfor %}
 					</td>
 					<td>{{ order.total }}</td>

@@ -23,11 +23,18 @@ class UserAccountInfoForm(ModelForm):
 
 error_messages={'required': 'must fill'}
 
-class UserRegistrationForm(forms.Form):	
-	username = forms.CharField(error_messages=error_messages, widget=forms.TextInput(attrs={'placeholder': 'username', 'class': 'form-control'}))
-	email = forms.CharField(error_messages=error_messages, widget=forms.EmailInput(attrs={'placeholder': 'email', 'class': 'form-control'}))
-	password = forms.CharField(error_messages=error_messages, widget=forms.PasswordInput(attrs={'placeholder': 'password', 'class': 'form-control'}))
-	password_confirm = forms.CharField(error_messages=error_messages, widget=forms.PasswordInput(attrs={'placeholder': 'Confirm password', 'class': 'form-control'}))
+class BalanceUpdateForm(ModelForm):	
+	class Meta:
+		model = User
+		labels = {'balance': 'balance'}
+		fields = ['balance']
+
+
+# class UserRegistrationForm(forms.Form):	
+# 	username = forms.CharField(error_messages=error_messages, widget=forms.TextInput(attrs={'placeholder': 'username', 'class': 'form-control'}))
+# 	email = forms.CharField(error_messages=error_messages, widget=forms.EmailInput(attrs={'placeholder': 'email', 'class': 'form-control'}))
+# 	password = forms.CharField(error_messages=error_messages, widget=forms.PasswordInput(attrs={'placeholder': 'password', 'class': 'form-control'}))
+# 	password_confirm = forms.CharField(error_messages=error_messages, widget=forms.PasswordInput(attrs={'placeholder': 'Confirm password', 'class': 'form-control'}))
 
 class UserLoginForm(forms.Form):	
 	username = forms.CharField(error_messages=error_messages, widget=forms.TextInput(attrs={'placeholder': 'username', 'class': 'form-control'}))
