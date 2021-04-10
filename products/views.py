@@ -18,6 +18,7 @@ def single_product(request, slug):
 	if request.method == 'GET':
 		product = Product.objects.get(slug=slug)
 		pid = product.productimage_set.all()
+		# y = pid.filter(product_id=product.id)
 		# pi = ProductImage.objects.filter(id=product_id)
 		# print(pid)
 		context = {"product": product,

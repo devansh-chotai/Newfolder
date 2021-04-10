@@ -20,7 +20,7 @@ My Cart - {{ block.super }}
 				<thead>
 					<tr>
 						<th>#</th>
-						<th>Product ID number</th>
+						<th></th>
 						<th>product name</th>
 						<th>unit price</th>
 						<th>Quantity</th>
@@ -32,7 +32,9 @@ My Cart - {{ block.super }}
 				{% for item in cart.cartitem_set.all %}
 				<tr>
 					<th scope="row">{{ forloop.counter }}</th>
-					<td>{{ item.product.id }}</td>
+					<td>
+						<img src="/media/{{ item.productimage.image }}" alt="image" height="180" width="180"/>
+					</td>
 					<td>
 						{{ item.product.title }}
 						{% if item.variation %}
@@ -55,39 +57,12 @@ My Cart - {{ block.super }}
 				{% endfor %}
 				</tbody>
 				<tfooter>
-					<!-- <tr>
-						<td>Shipping charges</td>
-						<td></td>
-						<td></td>
-						<td></td>
-						<td></td>
-						<td id="shippingPrice"><b>&#8377;</b> 80.00 </td>
-						<td></td>
-					</tr> -->
-					<!-- <tr>
-						<td>Total price</td>
-						<td></td>
-						<td></td>
-						<td></td>
-						<td></td>
-						<td><b>&#8377;</b> {{ cart.get_subtotal }}</td>
-						<td></td>
-					</tr>
-					<tr>
-						<td>Taxes (8%)</td>
-						<td></td>
-						<td></td>
-						<td></td>
-						<td></td>
-						<td><b>&#8377;</b> {{ cart.get_tax }}</td>
-						<td></td>
-					</tr> -->
 					<tr>
 						<td><strong>price</strong></td>
 						<td></td>
 						<td></td>
 						<td></td>
-						<td><input id='updateBtn' type='submit' class='btn btn-success btn-xs pull-right' value='Update'></td>
+						<td><input id='updateBtn' type='submit' class='hidden' value='Update'></td>
 						<td id="subTotal" data-subtotal="{{ cart.get_subtotal }}"><strong><b>&#8377;</b><span id="totalPrice"> {{cart.get_subtotal}}</span></strong></td>
 						<input type="hidden" id="balance" value="{{user.balance}}">
 						<td></td>
@@ -122,56 +97,55 @@ $(document).ajaxStart(function(){
 
 
 $(document).ready(function(){
-	$('#updateBtn').hide();
 	$('input[type="number"]').on('change', function(){
-		$('#updateBtn').show();
+		$('#updateBtn').trigger('click');
 	});
 });
 
 
-// using jQuery
-function getCookie(name) {
-    var cookieValue = null;
-    if (document.cookie && document.cookie != '') {
-        var cookies = document.cookie.split(';');
-        for (var i = 0; i < cookies.length; i++) {
-            var cookie = jQuery.trim(cookies[i]);
-            // Does this cookie string begin with the name we want?
-            if (cookie.substring(0, name.length + 1) == (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-            }
-        }
-    }
-    return cookieValue;
-}
-var csrftoken = getCookie('csrftoken');
+// // using jQuery
+// function getCookie(name) {
+//     var cookieValue = null;
+//     if (document.cookie && document.cookie != '') {
+//         var cookies = document.cookie.split(';');
+//         for (var i = 0; i < cookies.length; i++) {
+//             var cookie = jQuery.trim(cookies[i]);
+//             // Does this cookie string begin with the name we want?
+//             if (cookie.substring(0, name.length + 1) == (name + '=')) {
+//                 cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+//                 break;
+//             }
+//         }
+//     }
+//     return cookieValue;
+// }
+// var csrftoken = getCookie('csrftoken');
 
-function csrfSafeMethod(method) {
-    // these HTTP methods do not require CSRF protection
-    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
-}
-$.ajaxSetup({
-    beforeSend: function(xhr, settings) {
-        if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
-            xhr.setRequestHeader("X-CSRFToken", csrftoken);
-        }
-    }
-});
+// function csrfSafeMethod(method) {
+//     // these HTTP methods do not require CSRF protection
+//     return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+// }
+// $.ajaxSetup({
+//     beforeSend: function(xhr, settings) {
+//         if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+//             xhr.setRequestHeader("X-CSRFToken", csrftoken);
+//         }
+//     }
+// });
 
 $('#submitOrder').on('click', function(e){
 	e.preventDefault();
-	var x = $('#totalPrice').text();
-	var totalPrice = parseInt(x);
-	var y = document.getElementById('balance').value;
-	var Balance = parseInt(y);
-	console.log(Balance);
-	console.log(totalPrice);
-	if(totalPrice < Balance){
-		console.log('ordered sucessfully')
-		Balance=Balance-totalPrice
-		console.log(Balance)
-		window.location.href = "http://127.0.0.1:8000/orders/";
+	// var x = $('#totalPrice').text();
+	// var totalPrice = parseInt(x);
+	// var y = document.getElementById('balance').value;
+	// var Balance = parseInt(y);
+	// console.log(Balance);
+	// console.log(totalPrice);
+	// if(totalPrice < Balance){
+	// 	console.log('ordered sucessfully')
+	// 	Balance=Balance-totalPrice
+	// 	console.log(Balance)
+	window.location.href = "http://127.0.0.1:8000/orders/";
 
 	// 	$.ajax({
 	// 	url:'/mycart/',
@@ -187,10 +161,10 @@ $('#submitOrder').on('click', function(e){
   	// 	}	
 	// })// end ajax
 	
-	}
-	else{
-		document.getElementById("lowBalance").classList.remove("hidden");;
-	}
+	// }
+	// else{
+	// 	document.getElementById("lowBalance").classList.remove("hidden");;
+	// }
 })
 
 </script>

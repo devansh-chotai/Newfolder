@@ -12,9 +12,9 @@ My Cart - {{ block.super }}
 <div class="containter">
 	<div class="row">
 		<div class="col-md-10 col-md-offset-1">
-		<form action="{% url 'new_orders' %}" method="post">
-			{% csrf_token %}
-            <input type="hidden" id="balance" value="{{user.balance}}">
+		<!-- <form action="{% url 'new_orders' %}" method="post"> -->
+			<!-- {% csrf_token %} -->
+            <!-- <input type="hidden" id="balance" value="{{user.balance}}"> -->
             <!-- <h4 id="totalPrice">{{ order_total }}</h4> -->
             <!-- <td id="subTotal" data-subtotal="{{ cart.get_total }}"><strong><b>&#8377;</b><span id="totalPrice"> {{cart.get_total}}</span></strong></td> -->
             <table class="table">
@@ -87,15 +87,38 @@ My Cart - {{ block.super }}
 					</tr>			
 				</tfooter>
 			</table>
-            <span><button type="submit" id="submitOrder" class="btn btn-success">Order</button></span>
-		</form>
+            <span><button type="button" id="form" class="btn btn-success">Order</button></span>
+		<!-- </form> -->
 		<div class="text-center">
 			<span><a href="{% url 'all_products' %}"  class="btn btn-success">continue shopping</a></span>
 		</div><br>
-		<div class="text-center"><span id="lowBalance" class="hidden">Insufficcent balance <a href="{% url 'user_balance_info' %}">Add Money</a></span></div>
+		<!-- <div class="text-center"><span id="lowBalance" class="hidden">Insufficcent balance <a href="{% url 'user_balance_info' %}">Add Money</a></span></div> -->
 		</div>
 	</div>
 </div>
+
+<!--   Modal -->
+<div id="donm" class="t">
+
+	<div class="t-content">
+	  <div class="t-body">
+		<div class="row">
+			<div class="col-xs-6 col-xs-offset-3">
+				<form action="{% url 'new_orders' %}" method="post">
+				{% csrf_token %}
+				<input type="hidden" id="balance" value="{{user.balance}}">
+				<h2 class="form-signin-heading">Payment</h2>
+				<h5>Current balance: {{user.balance}}</h5>
+				<br><br>
+				<h6>Total Amount: {{cart.get_total}}</h6><br><br><br>
+				<button type="button" id="cancel" class="btn btn-danger">Cancel</button></span>
+				<button type="submit" id="submitOrder" class="btn btn-success">Pay {{cart.get_total}}</button></span>
+				<div class="text-center"><span id="lowBalance" class="hidden">Insufficcent balance <a href="{% url 'user_balance_info' %}">Add Money</a></span></div>
+			  </form>
+		</div>
+	  </div>
+	</div>
+  </div>
 
 {% endblock %}
 
@@ -112,15 +135,34 @@ $('#submitOrder').on('click', function(e){
 	var Balance = parseInt(y);
 	console.log(Balance);
 	console.log(totalPrice);
-	if(totalPrice < Balance){
+	if(totalPrice <= Balance){
 		console.log('ordered sucessfully')
 		Balance=Balance-totalPrice
 		console.log(Balance)
+		window.location.href = "http://127.0.0.1:8000/orders/history";
 	}
 	else{
 		document.getElementById("lowBalance").classList.remove("hidden");;
 	}
 })
+
+var donm = document.getElementById("donm");
+var cls = document.getElementById("cancel");
+var recm = document.getElementById("form");
+recm.onclick = function(e) {
+	e.preventDefault();	
+    donm.style.display = "block";
+}
+
+cls.onclick = function() {
+  donm.style.display = "none";
+}
+
+window.addEventListener("click", function(event) {
+  if (event.target == cls) {
+    donm.style.display = "none";
+  }
+});
 
 </script>
 {% endblock %}

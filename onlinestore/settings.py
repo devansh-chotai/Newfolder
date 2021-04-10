@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'accounts',
     'users',
     'orders',
+    'cartnew',
 ]
 
 MIDDLEWARE = [
@@ -144,11 +145,11 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
-print(STATIC_ROOT)
+# print(STATIC_ROOT)
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static"),
 ]
-print(STATICFILES_DIRS)
+# print(STATICFILES_DIRS)
 from django.contrib.messages import constants as message_constants
 MESSAGE_TAGS = {message_constants.DEBUG: 'debug',
                 message_constants.INFO: 'info',

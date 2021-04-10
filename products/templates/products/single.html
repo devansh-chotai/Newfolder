@@ -10,12 +10,14 @@
 			<div class="thumbnail">
 				<img src="/media/{{ images.image }}" alt="{{ product.title }}"/>
 			</div>
+			{{ images.image }}
 	</div>
 	{% endfor %}
 		<div class="caption text-center">
 			<form method="POST" action='{% url "my_cart" %}'>
 				{% csrf_token %}
 				<input type="hidden" name="product" value={{product.slug}} />
+				
 
 			 	{% if product.productvariation_set.all %}
 

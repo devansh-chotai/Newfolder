@@ -8,22 +8,26 @@
 		<table class="table table-striped">
 			<thead>
 				<tr>
-					<th>Order ID number</th>
-					<th>Order Status</th>
-					<th>product</th>
+					<th></th>
+					<th></th>
+					<th>Order ID</th>
+					<th>Status</th>
 					<th>Total price</th>
 				</tr>
 			</thead>
 			<tbody>
 				{% for order in orders %}
 				<tr>
-					<td>{{ order.order_id }}</td>
-					<td>{{ order.status }}</td>
+					<td>{% for image in order.cart.cartitem_set.all %}
+							<img src="/media/{{image.productimage.image}}" alt="image" height="180" width="180"><br><br>
+						{% endfor %}</td>
 					<td>
-					{% for product in order.cart.products.all %}
-						{{ product.title }}<br>
+					{% for product in order.cart.cartitem_set.all %}
+						{{ product.product.title }}<br>
 					{% endfor %}
 					</td>
+					<td>{{ order.order_id }}</td>
+					<td>{{ order.status }}</td>
 					<td>{{ order.total }}</td>
 				</tr>
 				{% endfor %}

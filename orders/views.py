@@ -20,7 +20,7 @@ User = get_user_model()
 @login_required
 def my_orders(request):
 	user = request.user
-	context = {'orders': user.order_set.all }
+	context = {'orders': user.order_set.all}
 	return render(request, 'orders/history.html', context)
 
 
@@ -57,7 +57,7 @@ def new_orders(request):
 			)		
 
 		order.save()
-		BalanceUpdate = User.objects.filter(username=user).first()
+		BalanceUpdate = User.objects.get(username=user)
 		BalanceUpdate.balance = user.balance - cart.get_total()
 		BalanceUpdate.save()
 		

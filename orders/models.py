@@ -1,7 +1,7 @@
 from django.db import models
 from django.conf import settings
 
-from carts.models import Cart
+from carts.models import Cart, CartItem
 from accounts.models import UserMailingAddress
 
 STATUS_CHOICES = (
@@ -15,6 +15,7 @@ STATUS_CHOICES = (
 class Order(models.Model):
 	user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 	cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
+	# cartitem = models.ForeignKey(CartItem, on_delete=models.CASCADE, blank=True)
 	mailing_address = models.ForeignKey(UserMailingAddress, on_delete=models.CASCADE)
 	order_id = models.CharField(max_length=10)	
 	status = models.CharField(max_length=50, choices=STATUS_CHOICES, default="Processing")
