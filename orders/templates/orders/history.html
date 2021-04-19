@@ -3,7 +3,7 @@
 {% block content %}
 {% include 'breadcrumbs.html' %}
 <div class="row">
-	<div class="col-md-8 col-md-offset-2">
+	<div class="col-md-12">
 		<h1>My Order</h1>
 		<table class="table table-striped">
 			<thead>
@@ -18,12 +18,33 @@
 			<tbody>
 				{% for order in orders %}
 				<tr>
-					<td>{% for image in order.cart.cartitem_set.all %}
-							<img src="/media/{{image.productimage.image}}" alt="image" height="180" width="180"><br><br>
-						{% endfor %}</td>
 					<td>
+						{% for image in order.cart.cartitem_set.all %}
+							{% if image.variation.last.productimage_set.first %}
+								<img src="/media/images/wl.gif" alt="{{item.variation.last}}" height="180" width="180" onload="(function(el){el.onload=' ';el.src='/media/{{image.variation.last.productimage_set.first.image}}';})(this)" /><br><br>
+							{% elif image.variation.first.productimage_set.first %}
+								<img src="/media/images/wl.gif" alt="{{item.variation.last}}" height="180" width="180" onload="(function(el){el.onload=' ';el.src='/media/{{image.variation.first.productimage_set.first.image}}';})(this)" /><br><br>
+							{% else %}
+							<!-- <img src="/media/{{image.productimage.image}}" alt="image" height="180" width="180"><br><br> -->
+								<img src="/media/images/wl.gif" alt="{{item.variation.last}}" height="180" width="180" onload="(function(el){el.onload=' ';el.src='/media/{{image.productimage.image}}';})(this)" /><br><br>
+							{% endif %}
+						{% endfor %}</td>
+					<td style="text-align: center;">
 					{% for product in order.cart.cartitem_set.all %}
-						{{ product.product.title }}<br>
+					<div class="mg-side">
+						<a href="{% url 'single_product' product.product.slug %}" class="a-link-normal">
+							{% if product.product.title|length > 55 %}
+								{{ product.product.title|slice:":55" }}...
+							{% else %}
+								{{ product.product.title }}
+							{% endif %}
+						</a><br>
+						{% if product.variation %}
+							{% for var in product.variation.all %}
+								<small>{{ var.category|title }}: {{ var.title }}</small><br>
+							{% endfor %}
+						{% endif %}
+					</div>	
 					{% endfor %}
 					</td>
 					<td>{{ order.order_id }}</td>

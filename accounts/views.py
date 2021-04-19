@@ -1,48 +1,27 @@
 from django.shortcuts import render
 from django.contrib.auth.models import User
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.clickjacking import xframe_options_exempt
+from django.views.generic.edit import FormView
+from django.contrib.auth.forms import PasswordChangeForm
+from django.urls import reverse_lazy
+from django.utils.decorators import method_decorator
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_protect
+from django.views.decorators.debug import sensitive_post_parameters
+
 
 from .forms import (User, UserMailingAddressForm, BalanceUpdateForm,
 	UserAccountInfoForm, UserLoginForm)
 from .models import UserMailingAddress
+from carts.models import Cart
+from orders.utils import quantity
 
-# def user_register(request):
-# 	form = UserRegistrationForm()
-
-# 	if request.method == 'POST':
-# 		form = UserRegistrationForm(request.POST)
-# 		if form.is_valid():
-# 			username = form.cleaned_data['username']
-# 			email = form.cleaned_data['email']
-# 			username_exist = User.objects.filter(username=username).last()
-# 			email_exist = User.objects.filter(email=email).first()
-
-# 			if username_exist:
-# 				messages.add_message(request, messages.ERROR, 'Username already exist. Please choose another one.')
-
-# 			if email_exist:
-# 				messages.add_message(request, messages.ERROR, 'The email address has already been registered.')
-
-# 			if form.cleaned_data['password'] == form.cleaned_data['password_confirm']\
-# 				and not username_exist and not email_exist:
-# 				new_user = User.objects.create(
-# 					username=username,
-# 					email=email)
-# 				new_user.set_password(form.cleaned_data['password'])
-# 				new_user.save()
-
-# 				messages.add_message(request, messages.SUCCESS, 'Registered successfully')
-# 				return HttpResponseRedirect(reverse('all_products'))
-# 			else:
-# 				messages.add_message(request, messages.ERROR, "Inconsistent passwords")
-
-# 	context = {'form': form}	
-# 	return render(request, 'accounts/register.html', context)
+@xframe_options_exempt
 def user_login(request):
 	form = UserLoginForm()
 	if request.method == 'POST':
@@ -71,6 +50,7 @@ def user_logout(request):
 @login_required
 def user_mailing_address(request, do_redirect=None):
 	user = request.user
+	qty = quantity(request)
 	initial = {}
 	if user.usermailingaddress_set.first():
 		address = user.usermailingaddress_set.last()
@@ -82,7 +62,7 @@ def user_mailing_address(request, do_redirect=None):
 		initial['phone'] = address.phone
 
 	form = UserMailingAddressForm(initial=initial)
-	context = {'form': form, 'do_redirect': do_redirect}
+	context = {'form': form, 'do_redirect': do_redirect, 'qty': qty}
 
 	if request.method == 'POST':
 		f = UserMailingAddressForm(request.POST, instance=user)
@@ -97,7 +77,7 @@ def user_mailing_address(request, do_redirect=None):
 
 			address.save()
 
-		messages.add_message(request, messages.SUCCESS, 'Mail address updated successfully')
+		messages.add_message(request, messages.SUCCESS, 'Shipping address updated successfully')
 
 		if do_redirect == 'yes':
 			return HttpResponseRedirect(reverse('user_mailing_address'))
@@ -108,13 +88,14 @@ def user_mailing_address(request, do_redirect=None):
 @login_required
 def user_account_info(request):
 	user = request.user
+	qty = quantity(request)
 	form = UserAccountInfoForm(
 				initial={
 					'username': user.username,
 					'email': user.email,
 				}
 			)
-	context = {'form': form}
+	context = {'form': form, 'qty': qty}
 
 	if request.method == 'POST':
 		f = UserAccountInfoForm(request.POST, instance=user)
@@ -123,21 +104,26 @@ def user_account_info(request):
 			user.username = f.cleaned_data['username']
 			user.save()
 
-		messages.add_message(request, messages.SUCCESS, 'Account information updated successfully')
+			messages.add_message(request, messages.SUCCESS, 'Account information updated successfully')
 
-		return HttpResponseRedirect(reverse('user_account_info'))
+			return HttpResponseRedirect(reverse('user_account_info'))
+		else:
+			messages.add_message(request, messages.ERROR, 'Usename/E-mail already exists.')
+			return HttpResponseRedirect(reverse('user_account_info'))
+
 
 	return render(request, 'accounts/account.html', context)
 
 @login_required
 def user_balance_info(request):
 	user = request.user
+	qty = quantity(request)
 	form = BalanceUpdateForm(
 				initial={
 					'balance': user.balance,
 				}
 			)
-	context = {'form': form}
+	context = {'form': form, 'qty':qty}
 
 	if request.method == 'POST':
 		f = BalanceUpdateForm(request.POST, instance=user)
@@ -149,4 +135,49 @@ def user_balance_info(request):
 
 		return HttpResponseRedirect(reverse('user_balance_info'))
 
-	return render(request, 'accounts/balance.html', context)		
+	return render(request, 'accounts/balance.html', context)	
+
+class PasswordContextMixin:
+    extra_context = None
+    def get_context_data(self, **kwargs):
+        user = self.request.user
+        if self.request.user.is_authenticated == False:
+            qty = 0
+        else:
+            cart = Cart.objects.filter(user=user).last()
+            if cart == None:
+                qty = 0
+            else:
+                qty = cart.cartitem_set.all().count()
+        extra_context = {'qty': qty}
+        # print(extra_context)
+        context = super().get_context_data(**kwargs)
+        context.update({
+            **(extra_context or {})
+        })
+        print(context)
+        return context
+
+class PasswordChangeView(PasswordContextMixin, FormView):
+    form_class = PasswordChangeForm
+    success_url = reverse_lazy('change_password')
+    template_name = 'resetpassword.html'
+
+    @method_decorator(sensitive_post_parameters())
+    @method_decorator(csrf_protect)
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        return super().dispatch(*args, **kwargs)
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
+
+    def form_valid(self, form):
+        form.save()
+        messages.add_message(self.request, messages.SUCCESS, 'Password changed successfully')
+        # Updating the password logs out all other sessions for the user
+        # except the current one.
+        update_session_auth_hash(self.request, form.user)
+        return super().form_valid(form)

@@ -7,73 +7,66 @@ from django.http import JsonResponse
 
 from .models import Cart, CartItem
 from products.models import Product, ProductImage
+from orders.utils import quantity
 
 def my_cart(request):
-	# Initiate cart
-	if 'total_items' not in request.session:
-		request.session['total_items'] = 0
-
-	if request.session.get('cart_id'):
-		cart_id = request.session.get('cart_id')
-		cart = Cart.objects.get(id=cart_id)
+	user = request.user
+	if request.user.is_authenticated:
+		cart = Cart.objects.filter(user=user).last()
+		if cart == None:
+			cart = Cart.objects.create(user=user)
+			qty = 0
+		else:
+			qty = cart.cartitem_set.all().count()
 	else:
-		cart = Cart.objects.create()
-		request.session['cart_id'] = cart.id
+		qty = 0
+		cart = Cart.objects.none()
 
 	if request.method == 'GET':
-		context = {'cart': cart,}
+		context = {'cart': cart,
+		'qty': qty,
+		}
 		return render(request, 'carts/mycart.html', context)
 
 	if request.method == 'POST':
 		if request.POST.get('_method') == 'put':
 			quantities = [quantity for quantity in request.POST.getlist('quantity')]
-			# print(dir(cart))
-			for idx, cart_item in enumerate(cart.cartitem_set.all()):
-				cart_item.quantity = quantities[idx]
-				cart_item.save()
+			if cart != None:
+				for idx, cart_item in enumerate(cart.cartitem_set.all()):
+					cart_item.quantity = quantities[idx]
+					cart_item.save()
 
 		else:
+			print(request.POST)
 			product_slug = request.POST.get('product')
 			quantity = request.POST.get('quantity')
 			product = Product.objects.get(slug=product_slug)
 			productimage = product.productimage_set.first()
 			variation_color = request.POST.get('color', None)
 			variation_size = request.POST.get('size', None)
-			if product in cart.cartitem_set.all():
-				messages.add_message(request, messages.ERROR, 'This product has been added to the shopping cart')
-			else:
-				new_item = CartItem(cart=cart, product=product, 
-				productimage=productimage, quantity=quantity)
-				new_item.save()
-				if variation_color is not None:
-					new_item.variation.add(variation_color)
-				if variation_size is not None:
-					new_item.variation.add(variation_size)
-				new_item.save()
-				cart.cartitem_set.add(new_item)
-				cart = Cart.objects.get(id=cart.id)
-				total_items = int(request.session['total_items'])
-				request.session['total_items'] = total_items + 1
+			if cart != None:
+				if product in cart.cartitem_set.all():
+					messages.add_message(request, messages.SUCCESS, 'This product has been added to the shopping cart')
+				else:
+					new_item = CartItem(cart=cart, product=product, 
+					productimage=productimage, quantity=quantity)
+					new_item.save()
+					if variation_color is not None:
+						new_item.variation.add(variation_color)
+					if variation_size is not None:
+						new_item.variation.add(variation_size)
+					new_item.save()
+					cart.cartitem_set.add(new_item)
+					cart = Cart.objects.get(user=user)
 
 		return HttpResponseRedirect(reverse('my_cart'))
-	
-	# if request.method == 'PUT':
-	# 	body = request.body.decode('utf-8')
-	# 	data = json.loads(body)
-	# 	cart.shipping_rate = float(data['rate'])
-	# 	cart.shipping_rate_id = data['rate_id']
-	# 	cart.save()
-	# 	return JsonResponse({'detail': 'The order is updated, lets go to the settlement!'})
-
 
 
 def remove_item(request, cart_item_id):
-	cart_id = request.session.get('cart_id')
-	cart = Cart.objects.get(id=cart_id)
+	user = request.user
+	cart = Cart.objects.get(user=user)
 	cart_item = CartItem.objects.get(id=cart_item_id)
 	cart.cartitem_set.remove(cart_item)
 	cart.save()
-	total_items = int(request.session['total_items'])
-	request.session['total_items'] = total_items - 1
 	messages.add_message(request, messages.SUCCESS, 'Product is deleted')
 	return HttpResponseRedirect(reverse('my_cart'))

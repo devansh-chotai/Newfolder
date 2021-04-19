@@ -13,9 +13,6 @@ def signup(request):
         form = SignUpForm(request.POST)
         if form.is_valid():
             user = form.save(commit=False)
-            # raw_password = form.cleaned_data.get('password')
-            # user = authenticate(password=raw_password)
-            # login(request, user)
             username = form.cleaned_data['username']
             password = form.cleaned_data.get('password')
             messages.success(request, f'Account created for {username}')

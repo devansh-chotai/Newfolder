@@ -8,15 +8,15 @@ My Cart - {{ block.super }}
 {% block content %}
 {% include 'breadcrumbs.html' %}
 
-<h1>my final cart</h1>
+
+<div class="wrap cf" style="width: 100%;">
+	<div class="heading cf">
+	  <h1>Confirm order</h1>
+	</div>
+
 <div class="containter">
 	<div class="row">
-		<div class="col-md-10 col-md-offset-1">
-		<!-- <form action="{% url 'new_orders' %}" method="post"> -->
-			<!-- {% csrf_token %} -->
-            <!-- <input type="hidden" id="balance" value="{{user.balance}}"> -->
-            <!-- <h4 id="totalPrice">{{ order_total }}</h4> -->
-            <!-- <td id="subTotal" data-subtotal="{{ cart.get_total }}"><strong><b>&#8377;</b><span id="totalPrice"> {{cart.get_total}}</span></strong></td> -->
+		<div>
             <table class="table">
 				<thead>
 					<tr>
@@ -77,25 +77,26 @@ My Cart - {{ block.super }}
 						<td></td>
 					</tr>
 					<tr>
-						<td><strong>Total price</strong></td>
 						<td></td>
 						<td></td>
 						<td></td>
 						<td></td>
-						<td id="subTotal" data-subtotal="{{ cart.get_total }}"><strong><b>&#8377;</b><span id="totalPrice"> {{cart.get_total}}</span></strong></td>
+						<td></td>
+						<td></td>
 						<td></td>
 					</tr>			
 				</tfooter>
-			</table>
-            <span><button type="button" id="form" class="btn btn-success">Order</button></span>
-		<!-- </form> -->
-		<div class="text-center">
-			<span><a href="{% url 'all_products' %}"  class="btn btn-success">continue shopping</a></span>
-		</div><br>
-		<!-- <div class="text-center"><span id="lowBalance" class="hidden">Insufficcent balance <a href="{% url 'user_balance_info' %}">Add Money</a></span></div> -->
+			</table><br>
 		</div>
 	</div>
 </div>
+
+<div class="subtotal cf">
+	<div>	  
+		<div id="subTotal" data-subtotal="{{ cart.get_subtotal }}" class="totalRow final"><span class="label">Total</span>&#8377;<span id="totalPrice" class="value"> {{cart.get_total}}</span></li>
+	  	<span class="totalRow"><a href="#" id="form" class="btn btn-success">Pay</a></li>
+	</div>
+  </div>
 
 <!--   Modal -->
 <div id="donm" class="t">
@@ -103,7 +104,7 @@ My Cart - {{ block.super }}
 	<div class="t-content">
 	  <div class="t-body">
 		<div class="row">
-			<div class="col-xs-6 col-xs-offset-3">
+			<div style="padding: 35px;">
 				<form action="{% url 'new_orders' %}" method="post">
 				{% csrf_token %}
 				<input type="hidden" id="balance" value="{{user.balance}}">
@@ -112,8 +113,8 @@ My Cart - {{ block.super }}
 				<br><br>
 				<h6>Total Amount: {{cart.get_total}}</h6><br><br><br>
 				<button type="button" id="cancel" class="btn btn-danger">Cancel</button></span>
-				<button type="submit" id="submitOrder" class="btn btn-success">Pay {{cart.get_total}}</button></span>
-				<div class="text-center"><span id="lowBalance" class="hidden">Insufficcent balance <a href="{% url 'user_balance_info' %}">Add Money</a></span></div>
+				<button type="submit" id="submitOrder" style="float: right;" class="btn btn-success">Pay {{cart.get_total}}</button></span><br><br>
+				<div class="text-center"><span id="lowBalance" style="color: #d9534f;" class="hidden">Insufficcent balance <a href="{% url 'user_balance_info' %}">Add Money</a></span></div>
 			  </form>
 		</div>
 	  </div>
@@ -124,45 +125,5 @@ My Cart - {{ block.super }}
 
 {% block scripts %}
 {{ block.super }}
-<!-- <script src="{% static 'js/main.js' %}"></script> -->
-<script>
-
-$('#submitOrder').on('click', function(e){
-	// e.preventDefault();
-	var x = $('#totalPrice').text();
-	var totalPrice = parseInt(x);
-	var y = document.getElementById('balance').value;
-	var Balance = parseInt(y);
-	console.log(Balance);
-	console.log(totalPrice);
-	if(totalPrice <= Balance){
-		console.log('ordered sucessfully')
-		Balance=Balance-totalPrice
-		console.log(Balance)
-		window.location.href = "http://127.0.0.1:8000/orders/history";
-	}
-	else{
-		document.getElementById("lowBalance").classList.remove("hidden");;
-	}
-})
-
-var donm = document.getElementById("donm");
-var cls = document.getElementById("cancel");
-var recm = document.getElementById("form");
-recm.onclick = function(e) {
-	e.preventDefault();	
-    donm.style.display = "block";
-}
-
-cls.onclick = function() {
-  donm.style.display = "none";
-}
-
-window.addEventListener("click", function(event) {
-  if (event.target == cls) {
-    donm.style.display = "none";
-  }
-});
-
-</script>
+<script src="{% static 'new.js' %}"></script>
 {% endblock %}

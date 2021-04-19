@@ -4,31 +4,76 @@
 {% block content %}
 	{% if search_term %}
 		{% include 'breadcrumbs.html' %}
-		<h2><strong>&#34;{{ search_term }}&#34;</strong>Search results for</h2>
+		<h4>Over {{ itemsfound }} results for <strong>&#34;{{ search_term}}&#34;</strong></h4>
 	{% endif %}
 
 	{% if products %}
 
 		{% for product in products %}
-		  <div class="col-sm-6 col-md-4">
-		    <div class="thumbnail">
-		      <img src="/media/{{ MEDIA_URL }}{{ product.productimage_set.first.image }}" alt="{{ product.title }}"/>
-		      <div class="caption text-center">
-		        <h3>{{ product.title }}</h3>
-		        <p><b>&#8377;</b> {{ product.price }}</p>
-				<a href='{% url "single_product" product.slug %}' class="btn btn-default" role="button">Product details</a>
-		      </div>
-		    </div>
-		  </div>
+		    <div class="col-sm-6 col-md-4">
+		    	<div class="thumbnail">
+					<div style="text-align: center;">
+						<!-- <img src="/media/{{ product.productimage_set.first.image }}" alt="{{ product.title }}" height="280" width="250"/> -->
+						<img src="/media/images/wl.gif" alt="{{product.productimage_set.var}}" height="280" width="250" onload="(function(el){el.onload=' ';el.src='/media/{{ product.productimage_set.first.image }}';})(this)" />
+					</div>
+					<div>
+						<div class="caption text-center">
+							<div>
+								<h4 style="font-weight: 600;">
+									{% if product.title|length > 45 %}
+										{{ product.title|slice:":45" }}...
+									{% else %}
+										{{ product.title }}
+									{% endif %}
+								</h4>
+								<p><b>&#8377;</b> {{ product.price }}</p>
+								<a href='{% url "single_product" product.slug %}' class="btn btn-default" style="border-radius: 4px; padding: 10px; float: none;" role="button">Product details</a>
+							</div>
+						</div>
+					</div>
+		    	</div>
+		  	</div>
 
 		{% endfor %}
 
 	{% else %}
 
 		{% if search_term %}
-			<p>Can't find what you want...try what's <a href="/">Trending</a></p>
+			<br><br><p class="bb">Can't find what you want...try what's <a href="/">Trending</a></p>
+			<h4>Recommended Items for you</h4>
+			<br>
+			{% if recommended_products %}
+
+				{% for product in recommended_products %}
+				<div class="col-sm-6 col-md-4">
+					<div class="thumbnail">
+						<div style="text-align: center;">
+							<img src="/media/{{ MEDIA_URL }}{{ product.productimage_set.first.image }}" alt="{{ product.title }}" height="280" width="250"/>
+						</div>
+						<div>
+							<div class="caption text-center">
+								<div>
+									<h4 style="font-weight: 600;">
+										{% if product.title|length > 45 %}
+											{{ product.title|slice:":45" }}...
+										{% else %}
+											{{ product.title }}
+										{% endif %}
+									</h4>
+									<p><b>&#8377;</b> {{ product.price }}</p>
+									<a href='{% url "single_product" product.slug %}' class="btn btn-default" role="button">Product details</a>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				{% endfor %}
+			{% else %}
+			<p>No recommended products based on your search results</p>
+			{% endif %}
+
 		{% else %}
-			<p>No prodcts have been listed in this store.</p>
+			<br><br><p class="bb">Can't find what you want...try what's <a href="/">Trending</a></p>
 		{% endif %}
 
 	{% endif %}

@@ -1,5 +1,5 @@
 from django.contrib import admin
-
+from django import forms
 from .models import Product, ProductImage, ProductVariation
 
 class ProductAdmin(admin.ModelAdmin):
@@ -19,6 +19,7 @@ class ProductImageAdmin(admin.ModelAdmin):
 	list_display = ['product', 'image', 'active', 'updated']
 	list_editable = ['active']
 	search_fields = ['image']
+	
 	class Meta:
 		model = ProductImage
 

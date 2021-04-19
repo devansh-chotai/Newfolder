@@ -15,20 +15,14 @@ class AddUserForm(forms.ModelForm):
     password = forms.CharField(
         label='Password', widget=forms.PasswordInput
     )
-    # password2 = forms.CharField(
-    #     label='Confirm password', widget=forms.PasswordInput
-    # )
+
 
     class Meta:
         model = User
         fields = ('username', 'email', 'balance')
 
     def clean_passwordt(self):
-        # Check that the two password entries match
         password = self.cleaned_data.get("password")
-        # password2 = self.cleaned_data.get("password2")
-        # if password and password and password != password:
-        #     raise forms.ValidationError("Passwords do not match")
         return password
 
     def save(self, commit=True):

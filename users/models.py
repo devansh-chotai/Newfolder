@@ -54,8 +54,6 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractBaseUser, PermissionsMixin):
-    # password field supplied by AbstractBaseUser
-    # last_login field supplied by AbstractBaseUser
     username_validator = UnicodeUsernameValidator()
 
     username = models.CharField(_('username'),
@@ -88,10 +86,7 @@ class User(AbstractBaseUser, PermissionsMixin):
             'Designates whether the user can log into this admin site.'
         ),
     )
-    # is_superuser field provided by PermissionsMixin
-    # groups field provided by PermissionsMixin
-    # user_permissions field provided by PermissionsMixin
-
+    
     date_joined = models.DateTimeField(
         _('date joined'), default=timezone.now
     )
@@ -101,16 +96,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     EMAIL_FIELD = 'email'
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ['email', 'balance',]
-
-    # def get_full_name(self):
-    #     """
-    #     Return the first_name plus the last_name, with a space in between.
-    #     """
-    #     full_name = '%s' % (self.username )
-    #     return full_name.strip()
-    #
-    # def __str__(self):
-    #     return '{} <{}>'.format(self.get_full_name(), self.email)
 
     def has_perm(self, perm, obj=None):
         "Does the user have a specific permission?"
@@ -126,9 +111,3 @@ class User(AbstractBaseUser, PermissionsMixin):
         """Send an email to this user."""
         send_mail(subject, message, from_email, [self.email], **kwargs)
 
-
-# class Signup(models.Model):
-#     username = models.CharField(max_length=32, blank=False)
-#     name = models.CharField(max_length=32, blank=False)
-#     email = models.EmailField(max_length=64, blank=False)
-#     password = models.CharField(max_length=64, blank=False)

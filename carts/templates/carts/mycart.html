@@ -1,171 +1,94 @@
 {% extends "base.html" %}
 {% load static %}
-
+{% block css %}
+	<link rel="stylesheet" type="text/css" href="{% static 'cart.css' %}">
+{% endblock %}
 {% block title %}
 My Cart - {{ block.super }}
 {% endblock %}
 
 {% block content %}
-{% include 'breadcrumbs.html' %}
 
-<h1>my shopping cart</h1>
-<div class="containter">
-	<div class="row">
-		<div class="col-md-10 col-md-offset-1">
-		{% if cart.cartitem_set.all %}
-		<form action="{% url 'my_cart' %}" method="post">
-			{% csrf_token %}
-			<input type="hidden" name="_method" value="put" />
-			<table class="table">
-				<thead>
-					<tr>
-						<th>#</th>
-						<th></th>
-						<th>product name</th>
-						<th>unit price</th>
-						<th>Quantity</th>
-						<th>price</th>
-						<th></th>
-					</tr>
-				</thead>
-				<tbody>
-				{% for item in cart.cartitem_set.all %}
-				<tr>
-					<th scope="row">{{ forloop.counter }}</th>
-					<td>
-						<img src="/media/{{ item.productimage.image }}" alt="image" height="180" width="180"/>
-					</td>
-					<td>
-						{{ item.product.title }}
-						{% if item.variation %}
-							{% for var in item.variation.all %}
-								<small>{{ var.category|title }}: {{ var.title }}</smalll><br>
-							{% endfor %}
-						{% endif %}
-					</td>
-					<td>{{ item.product.price }}</td>
-					<td style="min-width: 75px; width: 75px;">
-						<input type="number" min="1" max="9" size="6"value="{{ item.quantity }}" name="quantity" class="form-control">
-					</td>
-					<td>{{ item.total_price }}</td>
-					<td>
-						<a href="{% url 'remove_item' cart_item_id=item.id %}">
-							<span class="glyphicon glyphicon-remove"></span>
-						</a>
-					</td>
-				</tr>
-				{% endfor %}
-				</tbody>
-				<tfooter>
-					<tr>
-						<td><strong>price</strong></td>
-						<td></td>
-						<td></td>
-						<td></td>
-						<td><input id='updateBtn' type='submit' class='hidden' value='Update'></td>
-						<td id="subTotal" data-subtotal="{{ cart.get_subtotal }}"><strong><b>&#8377;</b><span id="totalPrice"> {{cart.get_subtotal}}</span></strong></td>
-						<input type="hidden" id="balance" value="{{user.balance}}">
-						<td></td>
-					</tr>			
-				</tfooter>
-			</table>
-		</form>
-		<div class="text-center">
-			<span><button id="submitOrder" class="btn btn-success">Checkout</button></span>
-			<span><a href="{% url 'all_products' %}"  class="btn btn-success">continue shopping</a></span>
-		</div><br>
-		<div class="text-center"><span id="lowBalance" class="hidden">Insufficcent balance <a href="{% url 'user_balance_info' %}">Add Money</a></span></div>
-		{% else %}
-			<p>The shopping cart is empty</p>
-		{% endif %}
-		</div>
+<div class="wrap cf">
+	<h1 class="projTitle">Shopping Cart</h1>
+	<div class="heading cf">
+	  <h1>My Cart</h1>
+	  <a href="{% url 'all_products' %}" class="continue">Continue Shopping</a>
 	</div>
-</div>
+	<div class="cart">
+
+	  
+	{% if cart.cartitem_set.all %}
+	<ul class="cartWrap" id="fade">
+	<form action="{% url 'my_cart' %}" method="post">
+		{% csrf_token %}
+		<input type="hidden" name="_method" value="put" />	
+	{% for item in cart.cartitem_set.all %}  
+		<li class="items even">
+	  <div class="infoWrap"> 
+		  <div class="cartSection">
+		  	{% if item.variation.last.productimage_set.first %}
+				<img class="thumbnail" src="/media/images/wl.gif" alt="{{item.variation.last}}" height="180" width="180" onload="(function(el){el.onload=' ';el.src='/media/{{item.variation.last.productimage_set.first.image}}';})(this)" />
+			{% elif item.variation.first.productimage_set.first %}
+				<img class="thumbnail" src="/media/images/wl.gif" alt="{{item.variation.first}}" height="180" width="180" onload="(function(el){el.onload=' ';el.src='/media/{{item.variation.first.productimage_set.first.image}}';})(this)" />
+			{% else %}
+				<img class="thumbnail" src="/media/images/wl.gif" alt="{{item.variation.first.productimage_set.first }}" height="180" width="180" onload="(function(el){el.onload=' ';el.src='/media/{{ item.productimage.image }}';})(this)" />
+			{% endif %}
+			<h3>
+				<a href='{% url "single_product" item.product.slug %}' class="a-link-normal">
+					{{ item.product.title }}
+					</a><br>
+					{% if item.variation %}
+						{% for var in item.variation.all %}
+							<small>{{ var.category|title }}: {{ var.title }}</small><br>
+						{% endfor %}
+					{% endif %}
+			</h3>
+		  
+			<p> <input type="number" min="1" max="10" size="6"value="{{ item.quantity }}" name="quantity" class="qty"/> x &#8377;	
+						{% if item.variation.first.price %}
+							{{item.variation.first.price}}
+						{% elif item.variation.last.price %}
+							{{item.variation.last.price}}
+						{% else %}
+							{{ item.product.price }}
+						{% endif %}
+			</p>
+		  
+			<p class="stockStatus"> In Stock</p>
+		  </div>  
+	  
+		  
+		  <div class="prodTotal cartSection">
+			<p>&#8377; {{ item.total_price }}</p>
+		  </div>
+				<div class="cartSection removeWrap">
+			 <a href="{% url 'remove_item' cart_item_id=item.id %}" class="remove">x</a>
+		  </div>
+		</div>
+		</li>
+	{% endfor %}
+	<input id='updateBtn' type='submit' class='hidden' value='Update'>
+	{% else %}
+		<p>The shopping cart is empty <a href="{% url 'all_products' %}">continue shopping</a></p>
+	{% endif %}	  
+
+	  </ul>
+	</div>
+		
+	<div class="subtotal cf">
+	  <div>
+		  <div id="subTotal" data-subtotal="{{ cart.get_subtotal }}" class="totalRow final"><span class="label">Total</span><span id="totalPrice" class="value">&#8377; {{cart.get_subtotal}}</span></div>
+		  <input type="hidden" id="balance" value="{{user.balance}}">
+	  </form>
+		<span class="totalRow"><a id="submitOrder" href="#"  class="btn continue">Checkout</a></span>
+	</div>
+	</div>
+  </div>
+
 {% endblock %}
 
 {% block scripts %}
 {{ block.super }}
-<!-- <script src="{% static 'js/main.js' %}"></script> -->
-
-<script>
-
-$(document).ajaxStart(function(){
-	$('#submitOrder').attr("disabled", true);
-}).ajaxStop(function(){
-	$('#submitOrder').attr("disabled", false);
-});
-
-
-$(document).ready(function(){
-	$('input[type="number"]').on('change', function(){
-		$('#updateBtn').trigger('click');
-	});
-});
-
-
-// // using jQuery
-// function getCookie(name) {
-//     var cookieValue = null;
-//     if (document.cookie && document.cookie != '') {
-//         var cookies = document.cookie.split(';');
-//         for (var i = 0; i < cookies.length; i++) {
-//             var cookie = jQuery.trim(cookies[i]);
-//             // Does this cookie string begin with the name we want?
-//             if (cookie.substring(0, name.length + 1) == (name + '=')) {
-//                 cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-//                 break;
-//             }
-//         }
-//     }
-//     return cookieValue;
-// }
-// var csrftoken = getCookie('csrftoken');
-
-// function csrfSafeMethod(method) {
-//     // these HTTP methods do not require CSRF protection
-//     return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
-// }
-// $.ajaxSetup({
-//     beforeSend: function(xhr, settings) {
-//         if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
-//             xhr.setRequestHeader("X-CSRFToken", csrftoken);
-//         }
-//     }
-// });
-
-$('#submitOrder').on('click', function(e){
-	e.preventDefault();
-	// var x = $('#totalPrice').text();
-	// var totalPrice = parseInt(x);
-	// var y = document.getElementById('balance').value;
-	// var Balance = parseInt(y);
-	// console.log(Balance);
-	// console.log(totalPrice);
-	// if(totalPrice < Balance){
-	// 	console.log('ordered sucessfully')
-	// 	Balance=Balance-totalPrice
-	// 	console.log(Balance)
-	window.location.href = "http://127.0.0.1:8000/orders/";
-
-	// 	$.ajax({
-	// 	url:'/mycart/',
-	// 	type: 'PUT',
-	// 	contentType: 'application/json;charset=UTF-8',
-  	// 	dataType: "json",
-  	// 	data: JSON.stringify({'rate': 80, 'rate_id': 'NULL'}),
-  	// 	success: function(r) {
-  	// 		console.log(r);
-  	// 	},
-  	// 	error: function(r) {
-  	// 		console.log(r);
-  	// 	}	
-	// })// end ajax
-	
-	// }
-	// else{
-	// 	document.getElementById("lowBalance").classList.remove("hidden");;
-	// }
-})
-
-</script>
+<script src="{% static 'mycart.js' %}"></script>
 {% endblock %}

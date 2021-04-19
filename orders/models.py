@@ -13,9 +13,9 @@ STATUS_CHOICES = (
 	)
 
 class Order(models.Model):
-	user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+	user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, blank=True)
 	cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
-	# cartitem = models.ForeignKey(CartItem, on_delete=models.CASCADE, blank=True)
+	# cartitem = models.ManyToManyField(CartItem, null=True, blank=True)
 	mailing_address = models.ForeignKey(UserMailingAddress, on_delete=models.CASCADE)
 	order_id = models.CharField(max_length=10)	
 	status = models.CharField(max_length=50, choices=STATUS_CHOICES, default="Processing")

@@ -12,19 +12,27 @@ Account Info - {{ block.super }}
 		<li role="presentation" class="active"><a href="{% url 'user_account_info' %}">account information</a></li>	
 		<li role="presentation"><a href="{% url 'user_mailing_address'%}">Shipping address</a></li>
 		<li role="presentation"><a href="{% url 'user_balance_info'%}">account balance</a></li>
+		<li role="presentation"><a href="{% url 'change_password'%}">Change Password</a></li>
 	</ul>
 </div>
 <div class='col-md-9'>
 	<h3>Update account information</h3><br>
-	<form action="{% url 'user_account_info' %}" method="post">
-	    {% csrf_token %}
-	    {{ form.email.label }}
-	    {{ form.email|add_class:"form-control"|append_attr:"placeholder:email address" }}<br>
-	    {{ form.username.label }}
-		{{ form.username|add_class:"form-control"|append_attr:"placeholder:username" }}<br>
-		<span>Balance : </span>&#8377; {{ user.balance }} <br><br><br>
+	<div class="a-box">
+        <div class="a-box-inner">
+			<form action="{% url 'user_account_info' %}" method="post">
+				{% csrf_token %}
+				{{ form.non_field_errors }}
+                {{ form.email.errors }}
+                {{ form.username.errors }}
+				{{ form.email.label }}
+				{{ form.email|add_class:"form-control"|append_attr:"placeholder:email address" }}<br>
+				{{ form.username.label }}
+				{{ form.username|add_class:"form-control"|append_attr:"placeholder:username" }}<br>
+				<span>Balance : </span>&#8377; {{ user.balance }} <br><br><br>
 
-	    <input class='btn btn-primary' type="submit" value="submit" />
-	</form>
+				<input class='btn btn-primary' type="submit" value="submit" />
+			</form>
+		</div>
+	</div>
 </div>
 {% endblock %}

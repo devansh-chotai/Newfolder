@@ -1,28 +1,41 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block content %}
 
 {% include 'breadcrumbs.html' %}
 
-<div class="row">
-	{% for images in pid %}
-	<div class="col-xs-12 col-sm-3">
-			<div class="thumbnail">
-				<img src="/media/{{ images.image }}" alt="{{ product.title }}"/>
+<div id="ajaximage-big" class="thumbnail hidden" style="width: fit-content;"></div>
+
+<div id="imagesbigerr" class="show thumbnail" href="/media/{{pid.first.image}}">
+		<img src="/media/{{pid.first.image}}" id="show-img" alt="">
+</div>
+
+<div class="small-img">
+
+	 <div class="small-container">
+		<div id="small-img-roll">
+			<div id="ajaximage" ></div>
+			<div id="images">
+				{% for images in pid %}
+				<img src="/media/{{ images.image }}" class="show-small-img" alt="">
+				{% endfor %}
 			</div>
-			{{ images.image }}
-	</div>
-	{% endfor %}
+		</div>               
+	 </div>
+</div>
+
+<div class="row">
 		<div class="caption text-center">
 			<form method="POST" action='{% url "my_cart" %}'>
 				{% csrf_token %}
-				<input type="hidden" name="product" value={{product.slug}} />
+				<input id="slug" type="hidden" name="product" value={{product.slug}} />
 				
 
 			 	{% if product.productvariation_set.all %}
 
 				 	{% if product.productvariation_set.sizes %}
-				 	<select class='form-control' name='size'>
+				 	<select id="size" class='form-control' name='size'>
 				 	{% for item in product.productvariation_set.sizes %}
 				 		<option value='{{ item.id }}'>{{ item.title }}</option>
 				 		{% endfor %}
@@ -30,7 +43,7 @@
 				 	{% endif %}
 
 				 	 {% if product.productvariation_set.colors %}
-				 	<select class='form-control' name='color'>
+				 	<select id="color" class='form-control' name='color'>
 				 	{% for item in product.productvariation_set.colors %}
 				 		<option value='{{ item.id }}'>{{ item.title }}</option>
 				 		{% endfor %}
@@ -44,65 +57,33 @@
 				<button id="cart" type="submit" class="btn btn-success">Add to Cart</button><br><br>
 				<span id="login" style="display: none;">You must first <a href="{% url 'user_login' %}">Log in</a></span>
 			</form>
-		</div>		
+		</div>
 	</div>
 	<div class="col-xs-12 col-sm-9">
 		<h3>{{ product.title }}</h3>
-		<p><span><b>&#8377;</b>  {{ product.price }}</span></p>
-		<p>{{ product.description }}</p>
+		{% if product.sale_price %}
+			<p>M.R.P: <del><b>&#8377;</b>  {{ product.sale_price }}</del></p>
+		{% endif %}
+		<p id="ProductPrice">Price:  &#8377; {{ product.price }}</p>
+		<p>{{ shippingdate }}</p>
+		<p>{{ product.description|linebreaks }}</p>
 	</div>
 </div>
 
 <!--   Modal -->
 <div id="donm" class="t">
-
 	<div class="t-content">
-		<span id="donclose" class="closer" style="color:black">&times;</span>
-	  <div class="t-body">
-		<div class="row">
-			<div class="col-xs-6 col-xs-offset-3">
-			  <form class="form-signin" method="POST" action="">
-			  {% csrf_token %}
-				<h2 class="form-signin-heading">please sign in</h2>
-				{{ form.as_p }}
-				<button class="btn btn-lg btn-primary btn-block" type="submit">log in</button>
-			  </form>
-			  <div class="page-header"></div>
-			  <p class="text-center">Don’t have an account?<a href="{% url 'user_register' %}"> Register an account here</a>.</p>
-		</div>
-		</div>
-	  </div>
+	  <iframe id="iframeContent" class="iframe" scrolling="no" src="{% url 'user_login' %}" frameborder="0" height="300" width="100%"></iframe>
 	</div>
-  </div>
-
-{% if user.is_authenticated %}
-{% else %}
-<script>
-// document.getElementById("cart").addEventListener("click", function(e){
-//   e.preventDefault();
-//   document.getElementById('login').style.removeProperty("display");
-// });
-var donm = document.getElementById("donm");
-var cls = document.getElementById("donclose");
-var recm = document.getElementById("cart");
-recm.onclick = function(e) {
-	e.preventDefault();	
-    donm.style.display = "block";
-}
-
-cls.onclick = function() {
-  donm.style.display = "none";
-}
-
-window.addEventListener("click", function(event) {
-  if (event.target == donm) {
-    donm.style.display = "none";
-  }
-});
-
-</script>
-{% endif %}
-
-
+</div>
 {% endblock %}
+
+{% block scripts %}
+<script src="{% static 'single2.js' %}"></script>
+{% if not user.is_authenticated %}
+	<script src="{% static 'single.js' %}"></script>
+{% endif %}
+{% endblock %}
+
+
 

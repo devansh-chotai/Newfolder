@@ -42,13 +42,13 @@ INSTALLED_APPS = [
     'django_extensions',
     'localflavor',
     'widget_tweaks',
+    'sass_processor',
     # Project Apps
     'products',
     'carts',
     'accounts',
     'users',
     'orders',
-    'cartnew',
 ]
 
 MIDDLEWARE = [

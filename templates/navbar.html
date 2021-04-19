@@ -1,13 +1,36 @@
-<nav class="navbar navbar-default">
+<nav id="nav" class="navbar navbar-default">
 	<div class="container">
-	    <!-- <div class="navbar-header"> -->
 	    <div class="col-xs-8 col-md-8">
 			<div class="nav" style="margin: .4em">
-				<form role="search" action="{% url 'search_products' %}">
+				<form role="search" id="pd" action="{% url 'search_products' %}">
 					<div class="input-group">
-						<input type="text" name="term" class="form-control" placeholder="Search our products...">
+						<input type="text" name="term" class="form-control" placeholder="Search our products..." value="{{ searchterm }}">
 						<span class="input-group-btn">
-						<button class="btn btn-default" type="submit">submit</button>
+						<button class="btn btn-default dropdown-toggle glyphicon glyphicon-filter" data-toggle="dropdown" type="button">{% if filtersizevalue %}{{filtersizevalue}}{% endif %}</button>
+						<ul class="dropdown-menu">
+							<li>
+								<button class="mc F_H" name="filter2" value="lowtohigh" type="submit">Price: Low to high
+								</button>
+							</li>
+							<li>
+								<button class="mc F_H" name="filter2" value="hightolow" type="submit">Price: High to low
+								</button>
+							</li>
+							<li>
+								<button class="mc F_H" name="filter2" value="newest" type="submit">Newest
+								</button>
+							<li role="separator" class="divider">Size</li>
+							<!-- </li><p style="text-align: center;">Shop by Size:</p> -->
+							<li><span><p>
+								<button class="cr-btn" name="filter3" value="S" type="submit">S</button>
+								<button class="cr-btn" name="filter3" value="M" type="submit">M</button>
+								<button class="cr-btn" name="filter3" value="L" type="submit">L</button></p><p>
+								<button class="cr-btn" name="filter3" value="XL" type="submit">XL</button>
+								<button class="cr-btn" name="filter3" value="2XL" type="submit">2XL</button></p>
+								</span>
+							</li>
+						</ul>
+						<button class="btn btn-default glyphicon glyphicon-search" id="trigger" type="submit"></button>
 						</span>
 					</div>
 				</form>
@@ -19,11 +42,11 @@
 					<a href='{% url "my_cart" %}'>
 						<span class="glyphicon glyphicon-shopping-cart"></span>
 						<span class="badge">
-							{% if 'total_items' in request.session %}
-								{{ request.session.total_items }}
-							{% else %}
-								0
-							{% endif %}
+						{% if user.is_authenticated %}
+							{{ qty }}
+						{% else %}
+							0
+						{% endif %}
 						</span>
 					</a>
 				</li>
@@ -33,7 +56,7 @@
 			<ul class="nav navbar-nav">
 			{% if user.is_authenticated %}
 					<div class="dropdown">
-						<button class="btn dropdown-toggle" data-toggle="dropdown" type="button"> {{user.username}}  <span class="caret"></span></button>
+						<button class="btn dropdown-toggle" style="background-color: inherit;" data-toggle="dropdown" type="button">Hi,<br> {{user.username}} </button>
 						<ul class="dropdown-menu">
 							<li><a href="{% url 'user_account_info' %}">Account details</a></li>
 							<li><a href="{% url 'my_orders' %}">Order record</a></li>

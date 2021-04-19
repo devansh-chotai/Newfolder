@@ -16,7 +16,13 @@ class CartItem(models.Model):
 		return "<CartItem: %s>" % (self.product.title)
 
 	def total_price(self):
-		return self.quantity * self.product.price
+		if self.variation.filter(category='size'):
+			if self.variation.filter(category='size').first().price:
+				return self.variation.filter(category='size').first().price * self.quantity
+			else:
+				return self.quantity * self.product.price
+		else:
+			return self.quantity * self.product.price
 
 	def image(self):
 		return self.productimage
@@ -31,7 +37,7 @@ class CartItem(models.Model):
 
 class Cart(models.Model):
 	id = models.AutoField(primary_key=True)
-	# user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+	user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True)
 	# shipping_rate = models.DecimalField(null=True, blank=True, max_digits=6, decimal_places=2)
 	# shipping_rate_id = models.CharField(null=True, blank=True, max_length=200)
 	created = models.DateTimeField(auto_now_add=True)
